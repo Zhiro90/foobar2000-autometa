@@ -20,7 +20,7 @@
 
 * **Dual Visual Modes:**
     * **Minimalist:** A single button (⚡) for the selected quick action, fits anywhere.
-    * **Track Info:** Displays the current Artist & Title.
+    * **Track Info:** Displays the current Artist & Title. Clicking on it focuses on the currently playing track
 * **Instant Grouping:** Click the main button to instantly create an autoplaylist of assigned tag form the the currently playing song.
 * **Smart Context Menu:**
     * **(▽):** Browse and select specific tags to group by (Metadata, Tech Info, System Stats).
