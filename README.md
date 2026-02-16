@@ -1,4 +1,5 @@
 # ⚡ AUTOMETA
+[![Download Autometa](https://img.shields.io/github/v/release/Zhiro90/foobar2000-autometa?style=for-the-badge&label=DOWNLOAD&color=232323&logo=foobar2000)](https://github.com/Zhiro90/foobar2000-autometa/releases/latest)
 ### Lightning-Fast Tag Grouper & Smart Playlist Generator for Foobar2000
 
 **Autometa** is a minimalist, customizable JScript Panel script designed to quickly create autplaylists based on the current track's tags with a single click (similar to the quick search function).
