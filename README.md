@@ -4,7 +4,6 @@
 **Autometa** is a minimalist, highly customizable JScript Panel script designed to organize your music library instantly. Create dynamic, autoplaying playlists based on any metadata tag with a single click.
 
 ![Minimalist Mode](screenshot_minimal.png)
-*(Replace this with a screenshot of the Minimalist Mode)*
 
 ## ✨ Features
 
@@ -22,7 +21,6 @@
 * **System Integration:** Works with both Default UI (DUI) and Columns UI (CUI).
 
 ![Info Mode](screenshot_info.png)
-*(Replace this with a screenshot of the Track Info Mode)*
 
 ## 🚀 Installation
 
