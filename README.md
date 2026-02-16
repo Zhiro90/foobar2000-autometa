@@ -5,14 +5,15 @@
 
 ![Minimalist Mode](screenshot_minimal.png)
 
+![Info Mode](screenshot_info.png)
 ## ✨ Features
 
 * **Dual Visual Modes:**
-    * **Minimalist:** A giant lightning bolt icon (\u26A1) for a clean, distraction-free look.
+    * **Minimalist:** A giant lightning bolt icon (⚡) for a clean, distraction-free look.
     * **Track Info:** Elegantly displays the current Artist & Title.
 * **Instant Grouping:** Click the main button to instantly group your library by your favorite tag (Album Artist, Genre, Year, etc.).
 * **Smart Context Menu:**
-    * **Left Click (\u25BC):** Browse and select specific tags to group by (Metadata, Tech Info, System Stats).
+    * **Left Click (▽):** Browse and select specific tags to group by (Metadata, Tech Info, System Stats).
     * **Shift + Click:** Assign any tag from the menu as the new **Default Quick Action**.
 * **Deep Customization:**
     * **Themes:** Choose between **Autometa Dark** (Default), **System** (Adapts to Foobar/Windows colors), or **Custom** (Define your own RGB values).
@@ -20,7 +21,7 @@
     * **Behavior:** Toggle between "Autoplay" (play immediately) or "List Only" (browse without interrupting playback).
 * **System Integration:** Works with both Default UI (DUI) and Columns UI (CUI).
 
-![Info Mode](screenshot_info.png)
+![Menu Contents](screenshot_menu.png)
 
 ## 🚀 Installation
 
@@ -58,4 +59,4 @@ Autometa supports custom coloring via the Properties menu.
 This project is licensed under the MIT License - feel free to modify and share!
 
 ---
-*Developed with \u2764\ufe0f for the Foobar2000 community.*
+*Developed with ❤️ for the Foobar2000 community.*
