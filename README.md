@@ -32,7 +32,7 @@
 * **System Integration:** Works with both Default UI (DUI) and Columns UI (CUI).
 
 
-Menu Contents (Nested)
+* Menu Contents (Nested)
 
 ![Menu Contents (Nested)](screenshot_menu.png)
 
