@@ -1,7 +1,7 @@
 # ⚡ AUTOMETA
 ### Lightning-Fast Tag Grouper & Smart Playlist Generator for Foobar2000
 
-**Autometa** is a minimalist, customizable JScript Panel script designed to quickly create autplaylists based on the current track's tags with a single click (similar to the quick search function)
+**Autometa** is a minimalist, customizable JScript Panel script designed to quickly create autplaylists based on the current track's tags with a single click (similar to the quick search function).
 
 
 
