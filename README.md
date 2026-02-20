@@ -8,12 +8,12 @@
 
 * Info Mode
 
-![Info Mode](screenshot_info.png)
+![Info Mode](Screenshots/screenshot_info.png)
 
 
 * Minimalist Mode
 
-![Minimalist Mode](screenshot_minimal.png)
+![Minimalist Mode](Screenshots/screenshot_minimal.png)
 
 
 
@@ -35,7 +35,7 @@
 
 * Menu Contents (Nested)
 
-![Menu Contents (Nested)](screenshot_menu.png)
+![Menu Contents (Nested)](Screenshots/screenshot_menu.png)
 
 
 ## 🚀 Installation
