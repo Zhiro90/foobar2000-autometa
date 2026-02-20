@@ -64,13 +64,19 @@ Autometa supports custom coloring via the Properties menu.
 2.  Set **Theme Mode** to `2` (Custom).
 3.  Edit the RGB values in text format (e.g., `255,0,0` for Red).
 
+## 🗺️ Roadmap (Planned QoL Features)
+
+* **Dynamic Tooltips:** Hovering over the main button will show you exactly which tag is currently assigned as the default quick action.
+* **Single Playlist Mode:** A toggle to reuse a single "Autometa Search" playlist instead of spawning a new tab every time you click, keeping your UI clean.
+* **Middle-Click Quick Toggle:** Use the middle mouse button to instantly swap between the Minimalist and Track Info display modes.
+* **Quick Auto-Play Modifier:** Hold `Alt` while clicking to temporarily invert your Auto-Play setting on the fly without opening the menu.
+
 ## 📋 Requirements
 * Foobar2000 v1.4 or newer.
 * Spider Monkey Panel OR JScript Panel 3
-
 * **OS:** Windows 10 or 11 (Recommended for full Emoji support).
 * **Fonts:** Segoe UI Emoji, Segoe UI Symbol.
-***
+
 
 ## 📄 License
 
