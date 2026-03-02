@@ -1,6 +1,9 @@
 # ⚡ AUTOMETA
-[![Download Autometa](https://img.shields.io/github/v/release/Zhiro90/foobar2000-autometa?style=for-the-badge&label=DOWNLOAD&color=232323&logo=foobar2000)](https://github.com/Zhiro90/foobar2000-autometa/releases/latest)
+[![Download Autometa](https://img.shields.io/github/v/release/Zhiro90/foobar2000-autometa?style=for-the-badge&label=DOWNLOAD&color=232323&logo=foobar2000)](https://github.com/Zhiro90/foobar2000-autometa/releases/latest) [![Downloads](https://img.shields.io/github/downloads/Zhiro90/foobar2000-autometa/total?style=for-the-badge&color=2b5b84)](https://github.com/Zhiro90/foobar2000-autometa/releases)  [![Website](https://img.shields.io/badge/Website-Foobar2000-b35c1e?style=for-the-badge)](https://www.foobar2000.org/)
+[![License](https://img.shields.io/github/license/Zhiro90/foobar2000-autometa?style=for-the-badge&color=3a7a40)](https://github.com/Zhiro90/foobar2000-autometa/blob/main/LICENSE)
+
 ### Lightning-Fast Tag Grouper & Smart Playlist Generator for Foobar2000
+
 
 **Autometa** is a minimalist, customizable JScript Panel script designed to quickly create autoplaylists based on the current track's tags with a single click (similar to the quick search function).
 
@@ -76,11 +79,6 @@ Autometa supports custom coloring via the Properties menu.
 * Spider Monkey Panel OR JScript Panel 3
 * **OS:** Windows 10 or 11 (Recommended for full Emoji support).
 * **Fonts:** Segoe UI Emoji, Segoe UI Symbol.
-
-
-## 📄 License
-
-This project is licensed under the MIT License - feel free to modify and share!
 
 ---
 *Made with 🤍 for the Foobar2000 community.*
