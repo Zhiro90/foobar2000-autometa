@@ -6,15 +6,20 @@
 //  /_/  |_\__,_/\__/\____/_/ /_/ /_/\___/\__/\__,_/  
 //
 //  ⚡ AUTOMETA: Lightning-Fast Tag Grouper & Smart Playlist Generator
-//  Version 1.1
+//  Version 1.2
+//  Author: Zhiro90
+//  Repo: https://github.com/Zhiro90/foobar2000-autometa
+//  License: MIT
 // ============================================================================
+
+var SCRIPT_VERSION = 1.2;
 
 // --- LOCALIZATION ---
 var lang = window.GetProperty("Language", 0); // 0 = English
 
 var STRINGS = {
     0: { // ENGLISH
-        cat_app: "Appearance",
+        cat_layout: "Layout",
         cat_beh: "Behavior",
         cat_lang: "Language",
         cat_theme: "Theme",
@@ -36,8 +41,9 @@ var STRINGS = {
         properties: "Panel Properties...",
         
         assign_header: "\u26A1 Assigned: ",
-        instr_click: "Click: Group",
-        instr_shift: "Shift+Click: Set Default",
+        act_group: "Group",
+        act_autoplay: "Auto-Play",
+        instr_mbtn: "Middle-Click: Toggle Layout",
         
         meta_header: "Metadata",
         tech_header: "Tech Info",
@@ -45,10 +51,17 @@ var STRINGS = {
         stopped: "Stopped",
         
         multi_sel: "Select value:",
-        multi_comb: " (Combined)"
+        multi_comb: " (Combined)",
+        tooltip_group: "Group by: ",
+
+        update_check: "\uD83D\uDD04 Check for Updates...",
+        update_uptodate: "You are using the latest version of Autometa (v",
+        update_avail: "A new version of Autometa is available! (v",
+        update_prompt: "Do you want to open the download page?",
+        update_error: "Could not check for updates. Please check your connection."
     },
     1: { // SPANISH
-        cat_app: "Apariencia",
+        cat_layout: "Diseño",
         cat_beh: "Comportamiento",
         cat_lang: "Idioma",
         cat_theme: "Tema",
@@ -70,8 +83,9 @@ var STRINGS = {
         properties: "Propiedades del Panel...",
 
         assign_header: "\u26A1 Asignado: ",
-        instr_click: "Clic: Agrupar",
-        instr_shift: "Shift+Clic: Asignar Default",
+        act_group: "Agrupar",
+        act_autoplay: "Auto-Play",
+        instr_mbtn: "Clic-Central: Cambiar Diseño",
         
         meta_header: "Metadatos",
         tech_header: "Info Técnica",
@@ -79,7 +93,14 @@ var STRINGS = {
         stopped: "Detenido",
         
         multi_sel: "Seleccionar valor:",
-        multi_comb: " (Combinado)"
+        multi_comb: " (Combinado)",
+        tooltip_group: "Agrupar por: ",
+
+        update_check: "\uD83D\uDD04 Buscar actualizaciones...",
+        update_uptodate: "Estás usando la última versión de Autometa (v",
+        update_avail: "¡Hay una nueva versión de Autometa disponible! (v",
+        update_prompt: "¿Deseas abrir la página de descarga?",
+        update_error: "No se pudo buscar la actualización. Revisa tu conexión."
     }
 };
 
@@ -106,26 +127,25 @@ function ParseColor(str) {
 }
 
 // --- GESTIÓN DE COLORES Y TEMAS ---
-// Propiedades para modo Custom (AHORA COMO TEXTO RGB)
 var theme_mode = window.GetProperty("Theme Mode", 0);
 var cust_bg_str = window.GetProperty("Custom Color: Background (R,G,B)", "23,23,23");
-var cust_txt_str = window.GetProperty("Custom Color: Text (R,G,B)", "255,255,255");
+var cust_txt_str = window.GetProperty("Custom Color: Text Main (R,G,B)", "255,255,255");
+var cust_dim_str = window.GetProperty("Custom Color: Text Sub (R,G,B)", "255,24,98");
 var cust_hlt_str = window.GetProperty("Custom Color: Highlight (R,G,B)", "180,50,120");
 var cust_btn_str = window.GetProperty("Custom Color: Buttons (R,G,B)", "50,50,50");
 
-// Variables dinámicas
 var c_bg, c_hover, c_btn, c_txt, c_dim;
+var ttip = window.CreateTooltip();
+var ttip_timer = null;
 
 function update_colors() {
     if (theme_mode === 0) { 
-        // AUTOMETA DARK
         c_bg = RGB(23, 23, 23);
         c_hover = RGB(180, 50, 120);
         c_btn = RGB(35, 35, 35);
         c_txt = RGB(245, 245, 245);
         c_dim = RGB(160, 160, 160);
     } else if (theme_mode === 1) { 
-        // SYSTEM (Auto - FIX CUI)
         try {
             if (window.InstanceType === 1) {
                 c_bg = window.GetColourDUI(1); 
@@ -144,12 +164,11 @@ function update_colors() {
         c_btn = (c_txt & 0x15ffffff); 
         c_dim = (c_txt & 0x90ffffff);
     } else { 
-        // CUSTOM (Usando el Parser)
         c_bg = ParseColor(cust_bg_str);
         c_txt = ParseColor(cust_txt_str);
+        c_dim = ParseColor(cust_dim_str);
         c_hover = ParseColor(cust_hlt_str);
         c_btn = ParseColor(cust_btn_str);
-        c_dim = c_txt; 
     }
 }
 
@@ -170,6 +189,43 @@ var display_mode = window.GetProperty("Display Mode", 1);
 var auto_play = window.GetProperty("Auto Play", false); 
 var viewMode = window.GetProperty("View Mode", 0);
 
+// --- UPDATER ---
+function check_for_updates() {
+    var url = "https://raw.githubusercontent.com/Zhiro90/foobar2000-autometa/main/autometa.js";
+    try {
+        var xmlhttp = new ActiveXObject("WinHttp.WinHttpRequest.5.1");
+        xmlhttp.Open("GET", url, false); // Síncrono para ventana de opciones
+        xmlhttp.SetRequestHeader("User-Agent", "Autometa_Foobar2000");
+        xmlhttp.SetTimeouts(3000, 3000, 3000, 3000); // Evitar cuelgues si no hay red
+        xmlhttp.Send();
+        
+        if (xmlhttp.Status === 200) {
+            var text = xmlhttp.ResponseText;
+            var match = text.match(/Version\s+([\d\.]+)/i);
+            
+            if (match) {
+                var online_ver = parseFloat(match[1]);
+                var WshShell = new ActiveXObject("WScript.Shell");
+                
+                if (online_ver > SCRIPT_VERSION) {
+                    var msg = getText("update_avail") + online_ver + ").\n\n" + getText("update_prompt");
+                    var btn = WshShell.Popup(msg, 0, "Autometa Update", 4 + 64); // Yes/No + Info Icon
+                    if (btn === 6) { // Si presiona Yes
+                        WshShell.Run("https://github.com/Zhiro90/foobar2000-autometa/releases/latest");
+                    }
+                } else {
+                    WshShell.Popup(getText("update_uptodate") + SCRIPT_VERSION + ")", 0, "Autometa", 64);
+                }
+            }
+        } else {
+            throw new Error("HTTP " + xmlhttp.Status);
+        }
+    } catch (e) {
+        var WshShell = new ActiveXObject("WScript.Shell");
+        WshShell.Popup(getText("update_error"), 0, "Autometa Error", 16);
+    }
+}
+
 // --- PAINT ---
 function on_paint(gr) {
     update_colors(); 
@@ -178,19 +234,22 @@ function on_paint(gr) {
     var handle = fb.GetNowPlaying();
 
     gr.FillSolidRect(0, 0, w, h, c_bg);
+    
+    // Flags 1 = Center H | 4 = Center V | 32 = Single Line (Requerido para el centrado vertical perfecto)
+    var icon_flags = 1 | 4 | 32;
 
     if (display_mode === 0) {
         // === MINIMALIST ===
         gr.FillSolidRect(0, 0, w - btn_width, h, hover_zone === 1 ? c_hover : c_bg);
-        gr.GdiDrawText("\u26A1", font_bolt_big, c_txt, 0, 0, w - btn_width, h, 1 | 4);
+        gr.GdiDrawText("\u26A1", font_bolt_big, c_txt, 0, 0, w - btn_width, h, icon_flags);
         gr.FillSolidRect(w - btn_width, 0, btn_width, h, hover_zone === 3 ? c_hover : c_btn);
-        gr.GdiDrawText("\u25BC", font_ui, c_txt, w - btn_width, 0, btn_width, h, 1 | 4);
+        gr.GdiDrawText("\u25BC", font_ui, c_txt, w - btn_width, 0, btn_width, h, icon_flags);
         // Divisor sutil
         if (theme_mode !== 1) gr.FillSolidRect(w - btn_width, 0, 1, h, RGB(0,0,0));
     } else {
         // === INFO TRACK ===
         gr.FillSolidRect(0, 0, btn_width, h, hover_zone === 1 ? c_hover : c_btn);
-        gr.GdiDrawText("\u26A1", font_bolt_small, c_txt, 0, 0, btn_width, h, 1 | 4);
+        gr.GdiDrawText("\u26A1", font_bolt_small, c_txt, 0, 0, btn_width, h, icon_flags);
         var txt_x = btn_width + 5;
         var txt_w = w - (btn_width * 2) - 10;
         // Hover central
@@ -204,7 +263,7 @@ function on_paint(gr) {
         }
 
         gr.FillSolidRect(w - btn_width, 0, btn_width, h, hover_zone === 3 ? c_hover : c_btn);
-        gr.GdiDrawText("\u25BC", font_ui, c_txt, w - btn_width, 0, btn_width, h, 1 | 4);
+        gr.GdiDrawText("\u25BC", font_ui, c_txt, w - btn_width, 0, btn_width, h, icon_flags);
         if (theme_mode !== 1) {
             gr.FillSolidRect(btn_width, 0, 1, h, RGB(0,0,0));
             gr.FillSolidRect(w - btn_width, 0, 1, h, RGB(0,0,0));
@@ -221,10 +280,30 @@ function on_mouse_move(x, y) {
     } else {
         if (x < btn_width) hover_zone = 1; else if (x > w - btn_width) hover_zone = 3; else hover_zone = 2;
     }
-    if (prev_zone !== hover_zone) window.Repaint();
+    
+    if (prev_zone !== hover_zone) {
+        if (ttip_timer) { clearTimeout(ttip_timer); ttip_timer = null; }
+        ttip.Deactivate();
+
+        if (hover_zone === 1) {
+            ttip.Text = getText("tooltip_group") + qa_field;
+            // Delay de 500ms antes de mostrar el Tooltip
+            ttip_timer = setTimeout(function() {
+                ttip.Activate();
+            }, 500);
+        }
+        window.Repaint();
+    }
 }
-function on_mouse_leave() { hover_zone = 0; window.Repaint(); }
+function on_mouse_leave() { 
+    hover_zone = 0; 
+    if (ttip_timer) { clearTimeout(ttip_timer); ttip_timer = null; }
+    ttip.Deactivate();
+    window.Repaint(); 
+}
 function on_mouse_lbtn_up(x, y) {
+    if (ttip_timer) { clearTimeout(ttip_timer); ttip_timer = null; }
+    ttip.Deactivate();
     switch (hover_zone) {
         case 1: run_quick_action(x, y); break;
         case 2: jump_to_now_playing(); break;
@@ -232,6 +311,14 @@ function on_mouse_lbtn_up(x, y) {
     }
 }
 function on_mouse_rbtn_up(x, y) { show_config_menu(x, y); return true; }
+
+// Toggle rápido de modo visual con Clic Central
+function on_mouse_mbtn_up(x, y) {
+    display_mode = display_mode === 0 ? 1 : 0;
+    window.SetProperty("Display Mode", display_mode);
+    window.Repaint();
+    return true;
+}
 
 // --- CORE ---
 function jump_to_now_playing() {
@@ -241,12 +328,10 @@ function jump_to_now_playing() {
     }
 }
 
-// FIX: Añadimos 'override_opt' para forzar la opción seleccionada desde el menú
 function run_quick_action(x, y, override_opt) {
     var handle = fb.GetNowPlaying();
     if (!handle) return;
     
-    // Si viene del menú usa el 'override_opt', si viene del rayo usa las propiedades por defecto
     var opt = override_opt ? override_opt : { field: qa_field, type: qa_type, rawPattern: qa_pattern, value: "" };
     var isMulti = false;
     var values = [];
@@ -286,10 +371,10 @@ function run_quick_action(x, y, override_opt) {
             
             var choice = multiMenu.TrackPopupMenu(x, y);
             if (choice > 0 && choice <= values.length) {
-                opt.value = values[choice - 1]; // Single selection
+                opt.value = values[choice - 1]; 
                 create_playlist(opt);
             } else if (choice === 99) {
-                create_playlist(opt, values); // Send array for combined query
+                create_playlist(opt, values); 
             }
         } else {
             create_playlist(opt);
@@ -327,40 +412,50 @@ function create_playlist(opt, multiValues) {
     var p_idx = plman.FindPlaylist(playlistName);
     if (p_idx === -1) p_idx = plman.CreateAutoPlaylist(plman.PlaylistCount, playlistName, query);
     plman.ActivePlaylist = p_idx;
-    if (auto_play) plman.ExecutePlaylistDefaultAction(p_idx, 0);
+    
+    // Inversión temporal con Alt (VK_MENU = 0x12)
+    var invert_autoplay = utils.IsKeyPressed(0x12);
+    var final_autoplay = invert_autoplay ? !auto_play : auto_play;
+    
+    if (final_autoplay) plman.ExecutePlaylistDefaultAction(p_idx, 0);
 }
 
 // --- MENUS (CONFIG) ---
 function show_config_menu(x, y) {
     var cMenu = window.CreatePopupMenu();
-    var subApp = window.CreatePopupMenu();
+    var subLayout = window.CreatePopupMenu();
     var subTheme = window.CreatePopupMenu();
     var subBeh = window.CreatePopupMenu();
     var subLang = window.CreatePopupMenu();
 
-    // 1. APARIENCIA
-    subApp.AppendMenuItem(display_mode === 0 ? 8 : 0, 1, getText("mode_minimal"));
-    subApp.AppendMenuItem(display_mode === 1 ? 8 : 0, 2, getText("mode_info"));
+    // 1. LAYOUT (Antes Appearance)
+    subLayout.AppendMenuItem(display_mode === 0 ? 8 : 0, 1, getText("mode_minimal"));
+    subLayout.AppendMenuItem(display_mode === 1 ? 8 : 0, 2, getText("mode_info"));
+    subLayout.AppendMenuItem(0, 0, "----------------");
+    subLayout.AppendMenuItem(1, 0, getText("instr_mbtn")); 
+    subLayout.AppendMenuItem(0, 0, "----------------");
+    subLayout.AppendMenuItem(viewMode === 0 ? 8 : 0, 5, getText("view_group"));
+    subLayout.AppendMenuItem(viewMode === 1 ? 8 : 0, 6, getText("view_flat"));
+    subLayout.AppendTo(cMenu, 16, getText("cat_layout"));
+    
+    // 2. TEMA
     subTheme.AppendMenuItem(theme_mode === 0 ? 8 : 0, 20, getText("theme_dark"));
     subTheme.AppendMenuItem(theme_mode === 1 ? 8 : 0, 21, getText("theme_sys"));
     subTheme.AppendMenuItem(theme_mode === 2 ? 8 : 0, 22, getText("theme_cust"));
     subTheme.AppendTo(cMenu, 16, getText("cat_theme")); 
-    subApp.AppendTo(cMenu, 16, getText("cat_app"));
 
-    // 2. COMPORTAMIENTO
+    // 3. COMPORTAMIENTO
     subBeh.AppendMenuItem(auto_play ? 8 : 0, 3, getText("autoplay_on"));
     subBeh.AppendMenuItem(!auto_play ? 8 : 0, 4, getText("autoplay_off"));
-    subBeh.AppendMenuItem(0, 0, "----------------");
-    subBeh.AppendMenuItem(viewMode === 0 ? 8 : 0, 5, getText("view_group"));
-    subBeh.AppendMenuItem(viewMode === 1 ? 8 : 0, 6, getText("view_flat"));
     subBeh.AppendTo(cMenu, 16, getText("cat_beh"));
 
-    // 3. IDIOMA
+    // 4. IDIOMA
     subLang.AppendMenuItem(lang === 0 ? 8 : 0, 10, getText("lang_en"));
     subLang.AppendMenuItem(lang === 1 ? 8 : 0, 11, getText("lang_es"));
     subLang.AppendTo(cMenu, 16, getText("cat_lang"));
 
     cMenu.AppendMenuItem(0, 0, "----------------");
+    cMenu.AppendMenuItem(0, 98, getText("update_check"));
     cMenu.AppendMenuItem(0, 99, getText("properties"));
 
     var choice = cMenu.TrackPopupMenu(x, y);
@@ -376,9 +471,10 @@ function show_config_menu(x, y) {
     else if (choice === 6) { viewMode = 1; window.SetProperty("View Mode", 1); }
     else if (choice === 10) { lang = 0; window.SetProperty("Language", 0); }
     else if (choice === 11) { lang = 1; window.SetProperty("Language", 1); }
+    else if (choice === 98) { check_for_updates(); }
     else if (choice === 99) { window.ShowConfigure(); }
     
-    if (choice >= 1) window.Repaint();
+    if (choice >= 1 && choice <= 22) window.Repaint();
 }
 
 // --- MENUS (SELECTOR) ---
@@ -390,8 +486,13 @@ function show_context_menu(x, y) {
     var validOptions = [];
     var idx = 1;
 
+    // --- CONSTRUCCIÓN DINÁMICA DE INSTRUCCIONES ---
+    var act_click = auto_play ? getText("act_autoplay") : getText("act_group");
+    var act_alt = auto_play ? getText("act_group") : getText("act_autoplay");
+    var instr_line = "Clic: " + act_click + " | +Shift: Default | +Alt: " + act_alt;
+
     mainMenu.AppendMenuItem(1, 0, getText("assign_header") + qa_field);
-    mainMenu.AppendMenuItem(1, 0, getText("instr_click") + " | " + getText("instr_shift"));
+    mainMenu.AppendMenuItem(1, 0, instr_line);
     mainMenu.AppendMenuItem(0, 0, "---------------------------");
 
     function addItem(menuObj, name, value, type, rawPattern) {
@@ -483,8 +584,6 @@ function show_context_menu(x, y) {
             window.SetProperty("Quick Action Pattern", qa_pattern);
             window.Repaint();
         } else {
-            // FIX: Usamos setTimeout (50ms) para asegurarnos de que el primer menú ya se cerró a nivel de sistema
-            // y le pasamos explícitamente el 'opt' que acabas de seleccionar.
             setTimeout(function() {
                 run_quick_action(x, y, opt);
             }, 50);
