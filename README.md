@@ -14,15 +14,15 @@
 
 ## 📢 What's New (v1.3)
 
-* **Single Playlist Mode:** Reuse a dedicated "Autometa Search" playlist. Prevents playlist manager saturation during rapid navigation.
+* **Single Playlist Mode:** Added an option to reuse a dedicated "Autometa Search" playlist instead of creating a new one for every query, to avoid clutter.
 * **Theme Import & Export:** Share and load custom color schemes directly via clipboard using JSON format.
-* **Granular Theming:** Expanded custom properties to 10 independent RGB variables. Control specific UI states, disabled buttons, and active text elements.
-* **Smart Date Truncation:** Automatically extracts the 4-digit year from ISO date strings (e.g., 2020-03-26 becomes 2020) upon quick action assignment.
+* **More Themable Elements:** Expanded custom properties to 10 independent RGB variables.
+* **Date Truncation:** Automatically extracts the 4-digit year from ISO date strings (e.g., 2020-03-26 becomes 2020) for the date quick-item in the submenu (full date grouping still available in the date item among the metadata tags section).
   
 # ✨ Features
 
 * **Instant Grouping:** Click the main button (⚡) to generate an autoplaylist of the assigned tag from the active track.
-* **Single Playlist Mode:** Restrict generation to one reusable tab.
+* **Single or Individual Playlists Mode:** Restrict generation to one reusable tab or create a new one for each query.
 * **Multi-Value Tag Support:** Detects tags separated by `; `. Prompts a sub-menu to isolate a value or query the combined string.
 * **Context Control:** Hold `Shift` while clicking a menu item to set it as the new default. Hold `Alt` over the main button to invert your auto-play rule temporarily.
 * **Dual UI Modes:** Swap between Minimalist (icon only) and Track Info (Artist/Title display).
